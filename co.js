@@ -1,0 +1,24 @@
+
+function co(generator) {
+    return function(fn) {
+        var gen = generator();
+
+        function next(err, result) {
+            if (err) {
+                return fn(err);
+            }
+
+            // 执行yield
+            var step = gen.next(result);
+            if (!step.done) {
+                step.value(next);
+            } else {
+                fn(null, step.value);
+            }
+        }
+
+        next();
+    };
+}
+
+module.exports = co;
